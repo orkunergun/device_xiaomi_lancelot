@@ -258,7 +258,8 @@ PRODUCT_PACKAGES += \
 
 # Overlays
 PRODUCT_PACKAGES += \
-    FrameworksResOverlayLancelot 
+    FrameworksResOverlayLancelot \
+    SystemUIOverlayLancelot
 
 # Partitions
 PRODUCT_BUILD_SUPER_PARTITION := false
