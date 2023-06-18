@@ -31,6 +31,10 @@ PRODUCT_USE_DYNAMIC_PARTITIONS := true
 # Product characteristics
 PRODUCT_CHARACTERISTICS := default
 
+# Recovery
+PRODUCT_PACKAGES += \
+    init.recovery.mt6768.rc
+
 # Rootdir
 PRODUCT_PACKAGES += \
     init.insmod.sh \
