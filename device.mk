@@ -82,6 +82,10 @@ PRODUCT_PACKAGES += \
     libdng_sdk.vendor \
     libmemunreachable.vendor
 
+# CAS
+PRODUCT_PACKAGES += \
+    android.hardware.cas@1.2-service-lazy
+
 # fastbootd
 PRODUCT_PACKAGES += \
     android.hardware.fastboot@1.1-impl-mock \
