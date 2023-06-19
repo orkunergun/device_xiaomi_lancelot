@@ -35,37 +35,35 @@ PRODUCT_CHARACTERISTICS := default
 PRODUCT_PACKAGES += \
     init.recovery.mt6768.rc
 
-# Rootdir
-PRODUCT_PACKAGES += \
-    init.insmod.sh \
-    install-recovery.sh \
 
+# Ramdisk
 PRODUCT_PACKAGES += \
-    fstab.enableswap \
-    meta_init.modem.rc \
-    init.project.rc \
-    init_connectivity.rc \
-    init.connectivity.common.rc \
-    multi_init.rc \
-    init.mt6768.rc \
-    init.sensor_1_0.rc \
-    meta_init.project.rc \
-    init.aee.rc \
-    init.cgroup.rc \
-    init.mt6768.usb.rc \
-    meta_init.connectivity.common.rc \
-    factory_init.connectivity.common.rc \
-    meta_init.connectivity.rc \
     factory_init.connectivity.rc \
-    init.connectivity.rc \
+    factory_init.connectivity.common.rc \
+    factory_init.project.rc \
     factory_init.rc \
     init.ago.rc \
+    init.cgroup.rc \
+    init_connectivity.rc \
+    init.connectivity.rc \
+    init.connectivity.common.rc \
+    init.mi_thermald.rc \
     init.modem.rc \
-    factory_init.project.rc \
+    init.mt6768.rc \
+    init.mt6768.usb.rc \
+    init.sensor_1_0.rc \
+    meta_init.connectivity.rc \
+    meta_init.connectivity.common.rc \
+    meta_init.modem.rc \
+    meta_init.project.rc \
     meta_init.rc \
+    multi_init.rc \
+    fstab.mt6768 \
+    ueventd.mtk.rc
 
+# Fstab
 PRODUCT_COPY_FILES += \
-    $(LOCAL_PATH)/rootdir/etc/fstab.enableswap:$(TARGET_COPY_OUT_RAMDISK)/fstab.enableswap
+    $(DEVICE_PATH)/rootdir/etc/fstab.mt6768:$(TARGET_COPY_OUT_RAMDISK)/fstab.mt6768
 
 # Shipping API level
 PRODUCT_SHIPPING_API_LEVEL := 29

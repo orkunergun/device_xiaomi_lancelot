@@ -1,20 +1,18 @@
 # MTK platform .rc configure
 
-import ${ro.vendor.rc}init.connectivity.rc
-import ${ro.vendor.rc}init.mt6768.usb.rc
+import /vendor/etc/init/hw/init.connectivity.rc
+import /vendor/etc/init/hw/init.mt6768.usb.rc
 import /vendor/etc/init/hw/init.project.rc
 import /system_ext/etc/init/hw/init.aee.rc
 import /FWUpgradeInit.rc
-import /vendor/etc/init/hw/init.aee.rc
-import ${ro.vendor.rc}init.volte.rc
-import ${ro.vendor.rc}init.mal.rc
-import ${ro.vendor.rc}init.sensor_1_0.rc
-import ${ro.vendor.rc}init.ago.rc
+import /vendor/etc/init/hw/init.volte.rc
+import /vendor/etc/init/hw/init.mal.rc
+import /vendor/etc/init/hw/init.sensor_1_0.rc
 import /vendor/etc/init/hw/init.stnfc.rc
 import /system/etc/init/hw/init.stnfc.rc
 
 # init.modem.rc must be the LAST rc file because vold.post_fs_data_done is set in it
-import ${ro.vendor.rc}init.modem.rc
+import /vendor/etc/init/hw/init.modem.rc
 # *** DO NOT import the new rc file after this line ***
 
 on early-init
@@ -22,19 +20,14 @@ on early-init
     # boot perf. tune
     write /proc/perfmgr/boost_ctrl/cpu_ctrl/boot_freq "0 0 0 0"
     write /sys/devices/platform/10012000.dvfsrc/helio-dvfsrc/dvfsrc_req_ddr_opp 0
-    mount debugfs debugfs /sys/kernel/debug
-    chmod 0755 /sys/kernel/debug
     chmod 0666 /sys/module/usb20_host/parameters/vbus_force_on
 
 on init
-    write /proc/bootprof "INIT:init"
-    # Support legacy paths
-    symlink /sdcard /mnt/sdcard
 
     # if primary storage is physical, set ro.vold.primary_physical to 1
     # setprop ro.vold.primary_physical 1
-
-    mkdir /mnt/cd-rom 0000 system system
+    
+    setprop sys.usb.ffs.aio_compat 1
 
 # change lk_env permission
     chown root system /proc/lk_env
@@ -48,7 +41,7 @@ on init
     write /dev/cpuset/foreground/cpus 0-7
     write /dev/cpuset/foreground/boost/cpus 0-7
     write /dev/cpuset/background/cpus 0-3
-    write /dev/cpuset/system-background/cpus 0-5
+    write /dev/cpuset/system-background/cpus 0-3
     write /dev/cpuset/top-app/cpus 0-7
 
 on late-init
@@ -98,17 +91,11 @@ on charger
 
     start vendor.light-default
     start mi_thermald
-    # Stop bootprof
-    write /proc/bootprof "0"
 
 on property:sys.boot_completed=1
     write /proc/pl_lk "0"
 
-on early-fs
-    write /proc/bootprof "INIT:early-fs"
-
 on fs
-    write /proc/bootprof "INIT:fs"
     start vendor.boot-hal-1-2
 
     # mount fstab
@@ -122,9 +109,7 @@ on fs
     write /proc/sys/vm/page-cluster 0
     write /proc/sys/vm/swappiness 100
     write /sys/kernel/mm/swap/vma_ra_enabled false
-    # swapon_all /vendor/fstab.enableswap
-
-    mount iso9660 loop@/vendor/etc/iAmCdRom.iso /mnt/cd-rom ro
+    swapon_all /vendor/etc/fstab.mt6768
 
 on post-fs
     write /proc/bootprof "INIT:post-fs"
@@ -135,9 +120,6 @@ on post-fs
     write /proc/perfmgr/boost_ctrl/eas_ctrl/boot_boost "2 100"
     write /proc/perfmgr/boost_ctrl/eas_ctrl/boot_boost "3 100"
     write /proc/perfmgr/boost_ctrl/eas_ctrl/sched_stune_task_thresh 0
-
-    # Support legacy paths
-    symlink /sdcard /storage/sdcard0
 
     #change permissions for mediaserver
     chown root media /proc/clkmgr/mipi_test
@@ -169,22 +151,18 @@ on post-fs
     # allow ccci_mdinit access ccci_dump
     chown root system /proc/ccci_dump
 
-# J15S&J19-S code for HQ-181137 by xiaqiangdan at 20220301 start
 #tp ito
     chown system system /proc/tp_selftest
     chmod 0664 /proc/tp_selftest
-# J15S&J19-S code for HQ-181137 by xiaqiangdan at 20220301 end
+
+
 
 on late-fs
     write /proc/bootprof "INIT:late-fs"
     wait_for_prop hwservicemanager.ready "true"
     setprop init.userspace_reboot.userdata_remount.timeoutmillis 10000
-    write /proc/bootprof "INIT:Mount_START --late"
-    write /sys/kernel/tracing/trace_marker "B|1|Mount late"
     mount_all /vendor/etc/fstab.mt6768 --late
     exec /system/bin/tune2fs -O has_journal -u 10010 -r 4096 /dev/block/platform/bootdevice/by-name/userdata
-    write /sys/kernel/tracing/trace_marker "E"
-    write /proc/bootprof "INIT:Mount_END --late"
 
 on post-fs-data
     write /proc/bootprof "INIT:post-fs-data"
@@ -215,6 +193,10 @@ on post-fs-data
     chown root system /mnt/vendor/nvdata
     chmod 0771 /mnt/vendor/nvdata
     mkdir /mnt/vendor/nvdata/media 0771 media audio
+
+    # AudioDump
+    mkdir /data/vendor/audiohal 0771 system audio
+    mkdir /data/vendor/audiohal/audio_param 0771 system audio
 
     #Create cct mount point
     mkdir /mnt/vendor/cct
@@ -262,20 +244,23 @@ on post-fs-data
 
     chmod 0660 /dev/spm
     chown system system /dev/spm
+    
+    # Correct VideoCodec permission
+    chmod 0666 /dev/video0
+    chmod 0666 /dev/video1
+
 
 # GPS
     chmod 0775 /vendor/xbin/MPED
     chmod 0666 /dev/gps_emi
 
 # Smart PA
-    mkdir /mnt/vendor/persist/audio/
-    chown system system /mnt/vendor/persist/audio/
-    chmod 0777 /mnt/vendor/persist/audio/
-# J15S&J19-S code for HQ-195405 by guquanding at 20220314 start
     mkdir /data/vendor/cirrus
     chown system system /data/vendor/cirrus
     chmod 0777 /data/vendor/cirrus
-# J15S&J19-S code for HQ-195405 by guquanding at 20220314 end
+    mkdir /mnt/vendor/persist/audio/
+    chown system system /mnt/vendor/persist/audio/
+    chmod 0777 /mnt/vendor/persist/audio/
 
 # -----------------------
 # Add by MTK
@@ -299,7 +284,7 @@ on post-fs-data
     chmod 444 /etc/radvd/radvd.conf
 
     # Mali 3D GPU driver
-    #insmod /vendor/lib/modules/mali.ko
+    #insmod /vendor/lib/modules_prebuilt/mali.ko
     chmod 666 /dev/mali0
     #chown system graphics /dev/mali
 
@@ -326,7 +311,7 @@ on post-fs-data
     chown root radio /dev/ptmx
 
     # M4U
-    #insmod /vendor/lib/modules/m4u.ko
+    #insmod /vendor/lib/modules_prebuilt/m4u.ko
     #mknod /dev/M4U_device c 188 0
     chmod 0444 /dev/m4u
     #chown system media /dev/M4U_device
@@ -337,11 +322,11 @@ on post-fs-data
     setrlimit 8 -1 -1
 
     # CMDQ
-    chmod 0640 /dev/mtk_cmdq
+    chmod 0644 /dev/mtk_cmdq
     chown system system /dev/mtk_cmdq
 
     # MDP SYNC
-    chmod 0640 /dev/mdp_sync
+    chmod 0644 /dev/mdp_sync
     chown system system /dev/mdp_sync
 
     #OFFLOAD SERVICE
@@ -372,16 +357,16 @@ on post-fs-data
     chmod 0660 /dev/vcu
     chown media system /dev/vcu
     chmod 0660 /dev/video0
-    chown media system /dev/video0
+    chown mediacodec system /dev/video0
     chmod 0660 /dev/video1
-    chown media system /dev/video1
+    chown mediacodec system /dev/video1
     mkdir /data/vendor/vcodec 0777 media system
     mkdir /data/vendor/vcodec/log 0770 media system
     mkdir /data/vendor/vcodec/in 0770 media system
     mkdir /data/vendor/vcodec/out 0770 media system
 
     #MJC
-    #insmod /vendor/lib/modules/mjc_kernel_driver.ko
+    #insmod /vendor/lib/modules_prebuilt/mjc_kernel_driver.ko
     #mknod /dev/MJC c 168 0
     chmod 0660 /dev/MJC
     chown media system /dev/MJC
@@ -496,7 +481,7 @@ on post-fs-data
 
     # FM Radio device node
     chmod 0660 /dev/fm
-    chown media media /dev/fm
+    chown system system /dev/fm
 
     # device apc settings
 
@@ -589,7 +574,7 @@ on post-fs-data
     chown system camera /dev/vpu
 
     #CCU
-    chmod 0660 /dev/ccu
+    chmod 0666 /dev/ccu
     chown system camera /dev/ccu
 
     #VOW
@@ -670,10 +655,10 @@ on post-fs-data
     chmod 0666 /dev/exm0
 
 
-	#Thermal
-	mkdir /data/vendor/.tp/ 0775 system system
-        mkdir /data/vendor/thermal 0771 root system
-        mkdir /data/vendor/thermal/config 0771 root system
+    #Thermal
+    mkdir /data/vendor/.tp/ 0775 system system
+    mkdir /data/vendor/thermal 0771 root system
+    mkdir /data/vendor/thermal/config 0771 root system
     # power manager
     write /sys/power/pm_async 0
 
@@ -681,19 +666,12 @@ on post-fs-data
     chmod 660 /dev/alarm
     chown root system /dev/alarm
 
-    mkdir /data/vendor/charge_logger 0771 system system
-
 # End of adding by MTK drivers
 # -----------------------
 
-on zygote-start
-    write /proc/bootprof "INIT:zygote-start"
-
-on early-boot
-    write /proc/bootprof "INIT:early-boot"
-    verity_update_state
-
 on boot
+    stop console
+    
     write /proc/bootprof "INIT:boot"
 
     write /proc/sys/vm/dirty_writeback_centisecs 300
@@ -708,7 +686,6 @@ on boot
     chmod 0664 /sys/class/leds/blue/brightness
     chown system system /sys/class/leds/blue/brightness
 
-    # J15S&J19-S code for HQ-181158 by xiaqiangdan at 20220217 start
     chmod 0664 /sys/devices/platform/flashlights_led191/led191_FLASH
     chown system system /sys/devices/platform/flashlights_led191/led191_FLASH
 
@@ -721,8 +698,7 @@ on boot
     chmod 0664 /sys/devices/platform/bootdevice/mmc_host/mmc0/mmc0:0001/serial
     chown system system /sys/devices/platform/bootdevice/mmc_host/mmc0/mmc0:0001/serial
 
-    chmod  0777 /dev/nq-nci
-    # J15S&J19-S code for HQ-181158 by xiaqiangdan at 20220217 end
+     chmod  0777 /dev/nq-nci
 
     chown system system /sys/devices/system/cpu/cpufreq/hotplug/cpu_num_base
     chmod 0660 /sys/devices/system/cpu/cpufreq/hotplug/cpu_num_base
@@ -775,7 +751,7 @@ on boot
     chmod 0777 /sys/class/power_supply/battery/input_suspend
     chown system system /sys/class/power_supply/battery/input_suspend
 
-	chown root system /sys/class/huaqin/interface/hw_info/main0_cam
+    chown root system /sys/class/huaqin/interface/hw_info/main0_cam
     chmod 0666 /sys/class/huaqin/interface/hw_info/main0_cam
     chown root system /sys/class/huaqin/interface/hw_info/main1_cam
     chmod 0666 /sys/class/huaqin/interface/hw_info/main1_cam
@@ -785,8 +761,6 @@ on boot
     chmod 0666 /sys/class/huaqin/interface/hw_info/main3_cam
     chown root system /sys/class/huaqin/interface/hw_info/sub_cam
     chmod 0666 /sys/class/huaqin/interface/hw_info/sub_cam
-
-
 # Smartbook Handler Framework
     chown system system /sys/power/sb_state
     chmod 0660 /sys/power/sb_state
@@ -929,53 +903,6 @@ on boot
 #Power Manager
     write /sys/power/pm_freeze_timeout 2000
 
-#J15s HQ-181149 add charge looger function by tongjiacheng at 2022/05/23 start
-# add charge_logger service for dump charge message
-service charge_logger /vendor/bin/charge_logger
-    class last_start
-    user system
-    group system system wakelock
-    disabled
-    oneshot
-
-on property:sys.boot_completed=1
-	start charge_logger
-
-    chmod 0664 /data/vendor/charge_logger/charge_logger_a.csv
-    chown system system /data/vendor/charge_logger/charge_logger_a.csv
-#J15s HQ-181149 add charge looger function by tongjiacheng at 2022/05/23 end
-
-on property:vold.decrypt=trigger_reset_main
-    write /proc/bootprof "INIT:vold.decrypt=trigger_reset_main"
-    setprop sys.boot_completed 0
-    setprop dev.bootcomplete 0
-
-on property:vold.decrypt=trigger_post_fs_data
-    write /proc/bootprof "INIT:vold.decrypt=trigger_post_fs_data"
-
-on property:vold.decrypt=trigger_restart_min_framework
-    write /proc/bootprof "INIT:vold.decrypt=trigger_restart_min_framework"
-    start nvram_daemon
-    start msensord
-
-on property:vold.decrypt=trigger_restart_framework
-    write /proc/bootprof "INIT:vold.decrypt=trigger_restart_framework"
-    start nvram_daemon
-    start msensord
-
-on property:vold.decrypt=trigger_shutdown_framework
-    write /proc/bootprof "INIT:vold.decrypt=trigger_shutdown_framework"
-    setprop sys.boot_completed 0
-    setprop dev.bootcomplete 0
-
-# bugreport is triggered by holding down volume down, volume up and power
-service bugreport /system/bin/dumpstate -d -p -B -z \
-        -o /data/user_de/0/com.android.shell/files/bugreports/bugreport
-    class late_start
-    disabled
-    oneshot
-    keycodes 114 115 116
-
 # end boot time fs tune
 on property:sys.boot_completed=1
     write /sys/block/mmcblk0/queue/iostats 1
@@ -1002,6 +929,7 @@ on property:sys.boot_completed=1
     write /dev/stune/foreground/schedtune.prefer_idle 0
     write /dev/stune/top-app/schedtune.prefer_idle 0
     write /dev/stune/rt/schedtune.prefer_idle 0
+    write /dev/stune/top-app/schedtune.boost 1
     write /proc/sys/kernel/sched_migration_cost_ns 200000
 
     # restore perf. parameters
@@ -1016,8 +944,6 @@ on property:sys.boot_completed=1
     # switch to sched-dvfs
     write /sys/devices/system/cpu/cpufreq/policy0/scaling_governor "schedplus"
     write /sys/devices/system/cpu/cpufreq/policy4/scaling_governor "schedplus"
-    # Stop bootprof
-    write /proc/bootprof "0"
 
 #service dpfd /vendor/bin/dpfd
 #	user root
@@ -1031,7 +957,7 @@ on property:sys.boot_completed=1
 #  Modem related services (Begin)
 #
 ##Add by T.Zh for ppp daemon
-#service pppd /system/bin/pppd file /data/misc/ppp/ppp_options
+#service pppd /bin/pppd file /data/misc/ppp/ppp_options
 #    user root
 #    disabled
 #    oneshot
@@ -1070,7 +996,6 @@ on property:persist.vendor.mediatek.fg.log.enable=1
     write /sys/devices/platform/battery_meter/FG_daemon_log_level 7
     write /sys/bus/platform/devices/battery/FG_daemon_log_level 7
     write /proc/sys/kernel/printk 8
-
 
 # add meta_tst for ATM
 service meta_tst /vendor/bin/meta_tst
@@ -1218,28 +1143,21 @@ on init
 
 # FPSGO FBT Game
 on boot
-    insmod /vendor/lib/modules/fpsgo.ko
-
-# VSIM service (vendor OSI)
-service osi /system/bin/osi
-    class main
-    user root
-    disabled
-    oneshot
-    #seclabel u:r:osi:s0
+    insmod /vendor/lib/modules_prebuilt/fpsgo.ko
 
 service maxcurrentNocall /system/vendor/bin/factory_bin m 0
     class main
     user root
     oneshot
     disabled
+
 service maxcurrentIncall /system/vendor/bin/factory_bin m 1
     class main
     user root
     oneshot
     disabled
 
-service mi_thermald /system/vendor/bin/mi_thermald
+service mi_thermald /vendor/bin/mi_thermald
     class main
     user root
     group system
@@ -1248,7 +1166,26 @@ service mi_thermald /system/vendor/bin/mi_thermald
 service PcbaConfigSet /system/vendor/bin/PcbaConfigSet
     class core
     oneshot
+    
+service charger /bin/charger
+    class charger
+    user system
+    group system graphics input
+    capabilities SYS_BOOT
+    seclabel u:r:charger:s0    
 
 on property:odm.audio.typec.status=*
     setprop vendor.audio.typec.status ${odm.audio.typec.status}
 
+service vendor.nfc_hal_service /vendor/bin/hw/android.hardware.nfc@1.2-service
+    override
+    class hal
+    user nfc
+    group nfc
+    disabled
+
+on property:ro.boot.product.hardware.sku=merlinnfc
+    start vendor.nfc_hal_service
+    
+on property:ro.boot.product.hardware.sku=galahad
+    start vendor.nfc_hal_service
