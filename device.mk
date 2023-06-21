@@ -187,6 +187,10 @@ PRODUCT_PACKAGES += \
     com.android.media.swcodec \
     libsfplugin_ccodec
 
+# Minijail
+PRODUCT_PACKAGES += \
+    libavservices_minijail.vendor
+
 # Overlays
 PRODUCT_ENFORCE_RRO_TARGETS := *
 
