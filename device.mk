@@ -268,6 +268,14 @@ PRODUCT_CHARACTERISTICS := default
 PRODUCT_COPY_FILES += \
     $(DEVICE_PATH)/configs/public.libraries.txt:$(TARGET_COPY_OUT_VENDOR)/etc/public.libraries.txt
 
+# Power
+PRODUCT_PACKAGES += \
+    android.hardware.power@1.0.vendor \
+    android.hardware.power@1.1.vendor \
+    android.hardware.power@1.2.vendor \
+    android.hardware.power@1.3.vendor \
+    android.hardware.power-service-mediatek 
+
 # Recovery
 PRODUCT_PACKAGES += \
     init.recovery.mt6768.rc
