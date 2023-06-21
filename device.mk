@@ -352,6 +352,10 @@ PRODUCT_PACKAGES += \
     android.hardware.thermal@2.0-impl \
     android.hardware.thermal@2.0.vendor
 
+# Text classifier
+PRODUCT_PACKAGES += \
+    libtextclassifier_hash.vendor
+
 # Shipping API level
 PRODUCT_SHIPPING_API_LEVEL := 29
 
