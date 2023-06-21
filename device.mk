@@ -356,6 +356,10 @@ PRODUCT_PACKAGES += \
 PRODUCT_PACKAGES += \
     libtextclassifier_hash.vendor
 
+# Vibrator
+PRODUCT_PACKAGES += \
+    android.hardware.vibrator-service.mediatek
+
 # Shipping API level
 PRODUCT_SHIPPING_API_LEVEL := 29
 
