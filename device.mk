@@ -191,6 +191,10 @@ PRODUCT_PACKAGES += \
 PRODUCT_PACKAGES += \
     libavservices_minijail.vendor
 
+# Net
+PRODUCT_PACKAGES += \
+    libpcap.vendor
+
 # Overlays
 PRODUCT_ENFORCE_RRO_TARGETS := *
 
