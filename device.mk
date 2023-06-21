@@ -339,6 +339,13 @@ PRODUCT_COPY_FILES += \
     $(DEVICE_PATH)/configs/seccomp/mediaextractor.policy:$(TARGET_COPY_OUT_VENDOR)/etc/seccomp_policy/mediaextractor.policy \
     $(DEVICE_PATH)/configs/seccomp/mediaswcodec.policy:$(TARGET_COPY_OUT_VENDOR)/etc/seccomp_policy/mediaswcodec.policy
 
+# Sensors
+PRODUCT_PACKAGES += \
+    libsensorndkbridge \
+    android.hardware.sensors@2.0.vendor \
+    android.hardware.sensors@2.0-ScopedWakelock.vendor \
+    android.hardware.sensors@2.1.vendor
+
 # Shipping API level
 PRODUCT_SHIPPING_API_LEVEL := 29
 
