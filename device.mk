@@ -303,6 +303,10 @@ PRODUCT_PACKAGES += \
     android.hardware.radio.config@1.3.vendor \
     android.hardware.radio.deprecated@1.0.vendor
 
+# RcsService
+PRODUCT_PACKAGES += \
+    RcsService
+
 # Recovery
 PRODUCT_PACKAGES += \
     init.recovery.mt6768.rc
