@@ -168,6 +168,10 @@ PRODUCT_PACKAGES += \
     libkeymaster_portable.vendor:64 \
     libpuresoftkeymasterdevice.vendor:64
 
+# Lights
+PRODUCT_PACKAGES += \
+    android.hardware.light-service.mt6768
+
 # Media
 PRODUCT_PACKAGES += \
     android.hardware.media.c2@1.0.vendor \
