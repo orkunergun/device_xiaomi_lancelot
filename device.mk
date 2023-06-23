@@ -155,11 +155,14 @@ PRODUCT_PACKAGES += \
     android.hardware.ir@1.0-impl \
     android.hardware.ir@1.0-service
 
+# Kernel
+PRODUCT_COPY_FILES += \
+    $(DEVICE_PATH)/prebuilts/dtb.img:dtb.img
+
 # Keylayout
 PRODUCT_COPY_FILES += \
     $(DEVICE_PATH)/configs/keylayout/uinput-fpc.kl:$(TARGET_COPY_OUT_SYSTEM)/usr/keylayout/uinput-fpc.kl \
     $(DEVICE_PATH)/configs/keylayout/uinput-goodix.kl:$(TARGET_COPY_OUT_SYSTEM)/usr/keylayout/uinput-goodix.kl
-
 
 # Keymaster
 PRODUCT_PACKAGES += \
