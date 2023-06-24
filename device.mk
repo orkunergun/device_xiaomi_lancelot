@@ -258,6 +258,7 @@ PRODUCT_PACKAGES += \
 
 # Overlays
 PRODUCT_PACKAGES += \
+    CarrierConfigOverlayLancelot \
     FrameworksResOverlayLancelot \
     SystemUIOverlayLancelot
 
