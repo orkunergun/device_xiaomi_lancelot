@@ -257,7 +257,8 @@ PRODUCT_PACKAGES += \
     android.hardware.neuralnetworks@1.3.vendor
 
 # Overlays
-PRODUCT_ENFORCE_RRO_TARGETS := *
+PRODUCT_PACKAGES += \
+    FrameworksResOverlayLancelot 
 
 # Partitions
 PRODUCT_BUILD_SUPER_PARTITION := false
