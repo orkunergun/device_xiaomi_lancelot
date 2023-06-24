@@ -344,6 +344,7 @@ vendor/lib64/libmialgo_basic.so
 vendor/lib64/libmialgo_sd.so
 vendor/lib64/libmialgo_utils.so
 vendor/lib64/libmibokeh_mt6768.so
+vendor/lib64/libmtkcam_3rdparty.customer.so|2bcac544a86838d73125a0831188778e618175a7
 vendor/lib64/libmpbase.so
 vendor/lib64/libremosaiclib.so
 vendor/lib64/libremosaic_wrapper.so
