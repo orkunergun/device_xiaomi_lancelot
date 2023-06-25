@@ -261,6 +261,7 @@ PRODUCT_PACKAGES += \
     CarrierConfigOverlayLancelot \
     FrameworksResOverlayLancelot \
     SystemUIOverlayLancelot \
+    TelephonyOverlayLancelot \
     TetheringOverlayLancelot \
     WifiOverlayLancelot
 
