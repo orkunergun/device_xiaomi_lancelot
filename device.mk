@@ -259,6 +259,7 @@ PRODUCT_PACKAGES += \
 # Overlays
 PRODUCT_PACKAGES += \
     ApertureResOverlayLancelot \
+    ApertureResOverlayLancelot \
     CarrierConfigOverlayLancelot \
     FrameworksResOverlayLancelot \
     SystemUIOverlayLancelot \
