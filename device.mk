@@ -260,7 +260,8 @@ PRODUCT_PACKAGES += \
 PRODUCT_PACKAGES += \
     CarrierConfigOverlayLancelot \
     FrameworksResOverlayLancelot \
-    SystemUIOverlayLancelot
+    SystemUIOverlayLancelot \
+    TetheringOverlayLancelot
 
 # Partitions
 PRODUCT_BUILD_SUPER_PARTITION := false
