@@ -261,7 +261,8 @@ PRODUCT_PACKAGES += \
     CarrierConfigOverlayLancelot \
     FrameworksResOverlayLancelot \
     SystemUIOverlayLancelot \
-    TetheringOverlayLancelot
+    TetheringOverlayLancelot \
+    WifiOverlayLancelot
 
 # Partitions
 PRODUCT_BUILD_SUPER_PARTITION := false
